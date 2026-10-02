@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Jack Ceballos | Student &amp; Leader</title>
+	<meta name="description" content="Meet Jack Ceballos, a Bothell High School student involved in class leadership, community, and music.">
 	<style>
 		:root { --navy:#102e5b; --blue:#1768ac; --ink:#182438; --muted:#53647a; }
 		* { box-sizing:border-box; }
@@ -37,12 +38,22 @@
 		.role { border-left:3px solid #55a8dc; padding:5px 0 5px 16px; }
 		.role strong,.role span { display:block; }
 		.role span,.attribution { color:var(--muted); font-size:.93rem; }
-		.music-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:24px; }
-		.music-group h3 { margin:0 0 10px; color:var(--navy); }
+		.music-catalog { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 24px; }
+		.music-group { min-width:0; }
+		.music-group summary { color:var(--navy); font-weight:700; cursor:pointer; }
+		.music-group summary::marker { color:var(--blue); }
+		.music-group summary:focus-visible { outline:3px solid #86c8f0; outline-offset:3px; }
+		.music-group[open] summary { margin-bottom:10px; }
 		.music-list { display:grid; gap:8px; }
 		.music-list a { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:11px 13px; border:1px solid #d9e6f3; border-radius:8px; color:var(--blue); text-decoration:none; font-weight:650; }
 		.music-list a:hover { background:#eaf5ff; }
 		.music-list a span:last-child { flex:none; font-size:.85rem; }
+		.song-picker { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin:0 0 18px; }
+		.song-picker button { padding:10px 15px; border:0; border-radius:8px; background:var(--blue); color:white; font:inherit; font-weight:700; cursor:pointer; }
+		.song-picker button:hover,.song-picker button:focus-visible { background:var(--navy); }
+		.song-picker button:focus-visible { outline:3px solid #86c8f0; outline-offset:3px; }
+		.music-pick { min-height:1.65em; margin:0; color:var(--muted); }
+		.music-pick a { color:var(--blue); font-weight:700; }
 		.quote { background:#eaf5ff; border-color:#d2eaff; text-align:center; }
 		.quote h2 { margin-bottom:8px; }
 		blockquote { max-width:690px; margin:12px auto; color:var(--navy); font:italic 1.4rem/1.5 Georgia,serif; }
@@ -64,7 +75,7 @@
 		.cheer strong { font-size:1.5rem; letter-spacing:.08em; }
 		.cheer span { font-size:1.6rem; }
 		footer { padding:20px; text-align:center; color:var(--muted); font-size:.9rem; }
-		@media(max-width:700px) { .cards { grid-template-columns:1fr; } .leadership,.music-grid { grid-template-columns:1fr; } .intro { margin-top:60px; } .links { gap:14px; } }
+		@media(max-width:700px) { .cards { grid-template-columns:1fr; } .leadership,.music-catalog { grid-template-columns:1fr; } .intro { margin-top:60px; } .links { gap:14px; } }
 		@media(max-width:430px) { .links a:first-child { display:none; } .cheer { align-items:flex-start; flex-direction:column; } }
 	</style>
 </head>
@@ -100,24 +111,12 @@
 		</section>
 		<section class="section" id="music">
 			<h2>On repeat</h2>
-			<p class="section-intro">Olivia Rodrigo songs and albums I love. Links open YouTube search results.</p>
-			<div class="music-grid">
-				<div class="music-group">
-					<h3>Favorite songs</h3>
-					<div class="music-list">
-						<a href="https://www.youtube.com/results?search_query=Olivia+Rodrigo+U%2BMe+%3D+%3C3" target="_blank" rel="noopener noreferrer"><span>U + Me = &lt;3</span><span>Listen on YouTube ↗</span></a>
-						<a href="https://www.youtube.com/results?search_query=Olivia+Rodrigo+traitor+official" target="_blank" rel="noopener noreferrer"><span>traitor</span><span>Listen on YouTube ↗</span></a>
-					</div>
-				</div>
-				<div class="music-group">
-					<h3>Albums</h3>
-					<div class="music-list">
-						<a href="https://www.youtube.com/results?search_query=Olivia+Rodrigo+SOUR+album" target="_blank" rel="noopener noreferrer"><span>SOUR</span><span>Explore on YouTube ↗</span></a>
-						<a href="https://www.youtube.com/results?search_query=Olivia+Rodrigo+GUTS+album" target="_blank" rel="noopener noreferrer"><span>GUTS</span><span>Explore on YouTube ↗</span></a>
-						<a href="https://www.youtube.com/results?search_query=Olivia+Rodrigo+you+seem+pretty+sad+for+a+girl+so+in+love+album" target="_blank" rel="noopener noreferrer"><span>you seem pretty sad for a girl so in love</span><span>Explore on YouTube ↗</span></a>
-					</div>
-				</div>
+			<p class="section-intro">Songs from my favorite albums, soundtracks, and more.</p>
+			<div class="song-picker">
+				<button type="button" id="pick-song" aria-controls="music-pick">Pick a song</button>
+				<p class="music-pick" id="music-pick" aria-live="polite"></p>
 			</div>
+			<div class="music-catalog" id="music-catalog"></div>
 		</section>
 		<section class="section support" aria-labelledby="support-heading">
 			<h2 id="support-heading">You matter, and you are not alone</h2>
@@ -146,5 +145,129 @@
 		<div class="cheer"><strong>GO COUGS</strong><span aria-label="Paw print and blue heart">🐾 💙</span></div>
 	</main>
 	<footer>Bothell High School · Northshore School District</footer>
+	<script>
+		const musicCatalog = [
+			{
+				title: 'SOUR (2021)',
+				tracks: [
+					'brutal', 'traitor', 'drivers license', '1 step forward, 3 steps back',
+					'deja vu', 'good 4 u', 'enough for you', 'happier', 'jealousy, jealousy',
+					'favorite crime', 'hope ur ok'
+				]
+			},
+			{
+				title: 'GUTS (spilled) (2023-24)',
+				tracks: [
+					'all-american bitch', 'bad idea right?', 'vampire', 'lacy',
+					'ballad of a homeschooled girl', 'making the bed', 'logical',
+					'get him back!', 'love is embarrassing', 'the grudge',
+					"pretty isn't pretty", 'teenage dream', 'obsessed',
+					"girl i've always been", 'scared of my guitar', 'stranger', 'so american'
+				]
+			},
+			{
+				title: 'you seem pretty sad for a girl so in love (2026)',
+				tracks: [
+					'drop dead', 'stupid song', 'honeybee', 'maggots for brains',
+					'u + me = <3', 'my way', 'purple', 'the cure', 'begged',
+					"what's wrong with me (with robert smith)", 'less', 'expectations',
+					'cigarette smoke', 'never do (bonus track)'
+				]
+			},
+			{
+				title: 'Bizaardvark (2016)',
+				tracks: [
+					'bizaardvark theme song', 'blobfish', 'love the haters', 'the comeback song'
+				]
+			},
+			{
+				title: 'Frozen Northern Lights (2016)',
+				tracks: ['let it glow']
+			},
+			{
+				title: 'High School Musical: The Musical: The Series (Season 1)',
+				tracks: [
+					'i think i kinda, you know (nini version)',
+					'start of something new (nini version)',
+					'i think i kinda, you know (duet)',
+					'wondering', 'wondering (ashlyn & nini piano version)',
+					"what i've been looking for (nini & e.j. version)", 'all i want',
+					'bop to the top (nini & kourtney version)', 'out of the old',
+					'just for a moment', 'breaking free (nini, ricky & e.j. version)'
+				]
+			},
+			{
+				title: 'High School Musical: The Musical: The Series (Season 2)',
+				tracks: [
+					'yac alma mater (nini version)', 'the best part',
+					'even when/the best part', 'granted', 'the rose song'
+				]
+			},
+			{
+				title: 'High School Musical: The Musical: The Series (Season 3)',
+				tracks: ['you never know']
+			},
+			{
+				title: 'High School Musical: The Musical: The Series (Holiday Special)',
+				tracks: ['river']
+			},
+			{
+				title: 'Soundtracks & Other Songs',
+				tracks: ['can\'t catch me now', 'monday (with the regrettes)', 'the bels', 'serena joy']
+			},
+			{
+				title: 'Live Covers',
+				tracks: [
+					'friday i\'m in love (with robert smith, live)',
+					'just like heaven (with robert smith, live)',
+					'stick season (with noah kahan, live lounge)',
+					'lacy (with noah kahan, live lounge)'
+				]
+			}
+		];
+		const youtubeSearchUrl = (title) => `https://www.youtube.com/results?search_query=${encodeURIComponent(`Olivia Rodrigo ${title}`)}`;
+		const musicCatalogElement = document.querySelector('#music-catalog');
+		const allTracks = musicCatalog.flatMap((group) => group.tracks);
+
+		for (const group of musicCatalog) {
+			const details = document.createElement('details');
+			details.className = 'music-group';
+
+			const summary = document.createElement('summary');
+			summary.textContent = `${group.title} · ${group.tracks.length} songs`;
+			details.append(summary);
+
+			const list = document.createElement('div');
+			list.className = 'music-list';
+			for (const title of group.tracks) {
+				const link = document.createElement('a');
+				link.href = youtubeSearchUrl(title);
+				link.target = '_blank';
+				link.rel = 'noopener noreferrer';
+
+				const trackName = document.createElement('span');
+				trackName.textContent = title;
+				const platform = document.createElement('span');
+				platform.textContent = 'YouTube ↗';
+				link.append(trackName, platform);
+				list.append(link);
+			}
+			details.append(list);
+			musicCatalogElement.append(details);
+		}
+
+		const pickSongButton = document.querySelector('#pick-song');
+		const musicPick = document.querySelector('#music-pick');
+
+		pickSongButton.addEventListener('click', () => {
+			const selection = allTracks[Math.floor(Math.random() * allTracks.length)];
+			const selectionLink = document.createElement('a');
+			selectionLink.href = youtubeSearchUrl(selection);
+			selectionLink.target = '_blank';
+			selectionLink.rel = 'noopener noreferrer';
+			selectionLink.textContent = selection;
+			musicPick.replaceChildren(selectionLink);
+		});
+	</script>
 </body>
 </html>
